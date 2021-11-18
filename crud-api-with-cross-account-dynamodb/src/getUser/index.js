@@ -1,7 +1,7 @@
-const { getDynamo, lastCredential } = require("/opt");
+const { getDynamoClient } = require("dynamoCrossAccountClient");
 
-exports.handler = async message => {
-  let dynamodb = await getDynamo();
+exports.handler = async (message, context) => {
+  let dynamodb = await getDynamoClient(context);
   console.log(message);
   let userId = message.pathParameters.id
   let params = {
@@ -18,6 +18,6 @@ exports.handler = async message => {
   return {
     statusCode: 200,
     headers: {},
-    body: JSON.stringify({...results.Item, lastCredential})
+    body: JSON.stringify({...results.Item})
   };
 }

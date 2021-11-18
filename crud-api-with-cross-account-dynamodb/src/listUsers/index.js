@@ -1,7 +1,7 @@
-const { getDynamo } = require("/opt");
+const { getDynamoClient } = require("dynamoCrossAccountClient");
 
-exports.handler = async message => {
-  let dynamodb = await getDynamo();
+exports.handler = async (message, context) => {
+  let dynamodb = await getDynamoClient(context);
   console.log(message);
 
   let params = {

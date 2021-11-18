@@ -45,7 +45,7 @@ Resources:
       Properties:
           LayerName: common-assumerole-layer-sample
           Description: Lambda layer for assume role capabilities
-          ContentUri: common/
+          ContentUri: common/assumeRoleLayer/
           CompatibleRuntimes:
             - nodejs12.x
           LicenseInfo: 'MIT'

@@ -1,7 +1,7 @@
 
-const { getDynamo } = require("/opt");
+const { getDynamoClient } = require("dynamoCrossAccountClient");
 
-exports.handler = async message => {
+exports.handler = async (message, context) => {
 
   console.log(message);
 
@@ -19,8 +19,7 @@ exports.handler = async message => {
 
     console.log(`Adding user to table ${process.env.TABLE_NAME}`);
     try {
-
-      let dynamodb = await getDynamo();
+      let dynamodb = await getDynamoClient(context);
       await dynamodb.putItem(params).promise()
     } catch (err) {
       return {
