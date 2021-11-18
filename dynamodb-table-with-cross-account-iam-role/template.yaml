@@ -1,0 +1,75 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description:
+  Sample SAM Template for DynamoDB table and IAM role for DynamoDB access via cross-account trust policy
+  
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 10
+Parameters:
+  RoleName:
+    Type: String
+    Default: "DynamoDbRole"
+  LambdaAssumeRole:
+    Default: arn:aws:iam::421275677139:role/crud-api-with-cross-account-dynamodb-st-LambdaRole-L650MMPAUE2Z
+    # Replace this role ARN with the ARN of the role in the account where your Lambda functions are deployed
+    Type: String
+
+Resources:
+  UserTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      TableName: !Sub ${AWS::StackName}-UserTable
+
+  AssumeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref RoleName
+      Policies:
+          -
+            PolicyName: "TableAdminUserExample"
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                -
+                  Effect: "Allow"
+                  Action: "*"
+                  Resource: !GetAtt UserTable.Arn
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal: 
+            "AWS": !Sub ${LambdaAssumeRole}
+          Action:
+          - sts:AssumeRole
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  DynamoDBRoleName:
+    Description: "Cross-account IAM Role for DynamoDB Name"
+    Value: !Ref AssumeRole
+  DynamoDBRoleArn:
+    Description: "Cross-account IAM Role for DynamoDB ARN"
+    Value: !GetAtt AssumeRole.Arn
+  AccountId:
+    Description: "Account ID"
+    Value: !Ref "AWS::AccountId"
+  DynamoDBTableArn:
+    Description: "DynamoDB User Table ARN"
+    Value: !GetAtt UserTable.Arn
+  DynamoDBTableName:
+    Description: "DynamoDB User Table Name"
+    Value: !Ref UserTable

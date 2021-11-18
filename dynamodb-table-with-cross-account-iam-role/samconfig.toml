@@ -1,0 +1,14 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "dynamodb-cross-account-stack"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-2k2i07j9eg0"
+s3_prefix = "dynamodb-cross-account-stack"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_NAMED_IAM"
+disable_rollback = true
+image_repositories = []
+profile = "amazon"
+parameter_overrides = "RoleName=\"DynamoDbRole\" LambdaAssumeRole=\"arn:aws:iam::421275677139:role/crud-api-with-cross-account-dynamodb-st-LambdaRole-L650MMPAUE2Z\""

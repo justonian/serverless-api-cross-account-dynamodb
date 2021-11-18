@@ -1,0 +1,14 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "crud-api-with-cross-account-dynamodb-stack"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-jplfp9dbcgyl"
+s3_prefix = "crud-api-with-cross-account-dynamodb-stack"
+region = "us-east-1"
+profile = "demos"
+confirm_changeset = true
+capabilities = "CAPABILITY_NAMED_IAM"
+disable_rollback = true
+parameter_overrides = "SourceRoleArn=\"arn:aws:iam::554161763323:role/DynamoDbRole\" SourceTableArn=\"arn:aws:dynamodb:us-east-1:554161763323:table/dynamodb-cross-account-stack-UserTable\" SourceTableName=\"dynamodb-cross-account-stack-UserTable\" APIGatewayStageName=\"prod\""
+image_repositories = []

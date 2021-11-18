@@ -1,0 +1,244 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: CRUD API with Lambda cross-account assume role sample
+
+Parameters:
+  SourceRoleArn:
+    Type: String
+    Default: arn:aws:iam::554161763323:role/DynamoDbRole
+  SourceTableArn:
+    Type: String
+    Default: arn:aws:dynamodb:us-east-1:554161763323:table/dynamodb-cross-account-stack-UserTable
+  SourceTableName:
+    Type: String
+    Default: dynamodb-cross-account-stack-UserTable
+  APIGatewayStageName:
+    Type: String
+    Default: prod
+
+Resources:
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+      - PolicyName: allow-generate-temporary-credentials
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+          - Effect: Allow
+            Action: "sts:*"
+            Resource: !Sub ${SourceRoleArn}
+
+  CommonLayer:
+      Type: AWS::Serverless::LayerVersion
+      Properties:
+          LayerName: common-assumerole-layer-sample
+          Description: Lambda layer for assume role capabilities
+          ContentUri: common/
+          CompatibleRuntimes:
+            - nodejs12.x
+          LicenseInfo: 'MIT'
+          RetentionPolicy: Retain
+
+  API:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: Users API
+      StageName: !Sub ${APIGatewayStageName}
+      DefinitionBody:
+        swagger: '2.0'
+        info: {}
+        paths:
+          /users:
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListUsersFunction.Arn}/invocations
+              responses: {}
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreateUserFunction.Arn}/invocations
+              responses: {}
+          /users/{id}:
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetUserFunction.Arn}/invocations
+              responses: {}
+            put:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateUserFunction.Arn}/invocations
+              responses: {}
+            delete:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeleteUserFunction.Arn}/invocations
+              responses: {}
+      EndpointConfiguration: REGIONAL
+
+  GetUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-getUser
+      Description: getUser
+      CodeUri: src/getUser
+      Handler: index.handler
+      Runtime: nodejs12.x
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Role: !GetAtt LambdaRole.Arn
+      Layers:
+      - !Ref CommonLayer
+      Environment:
+        Variables:
+          TABLE_NAME: !Sub "${SourceTableName}"
+          TABLE_ARN: !Sub "${SourceTableArn}"
+          ROLE_ARN: !Sub "${SourceRoleArn}"
+      Events:
+        apiGetUsersId:
+          Type: Api
+          Properties:
+            Path: /users/{id}
+            Method: GET
+            RestApiId: !Ref API
+
+  UpdateUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-updateUser
+      Description: Update User Function
+      CodeUri: src/updateUser
+      Handler: index.handler
+      Runtime: nodejs12.x
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Role: !GetAtt LambdaRole.Arn
+      Layers:
+      - !Ref CommonLayer
+      Environment:
+        Variables:
+          TABLE_NAME: !Sub "${SourceTableName}"
+          TABLE_ARN: !Sub "${SourceTableArn}"
+          ROLE_ARN: !Sub "${SourceRoleArn}"
+      Events:
+        apiPutUsersId:
+          Type: Api
+          Properties:
+            Path: /users/{id}
+            Method: PUT
+            RestApiId: !Ref API
+
+  CreateUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-createUser
+      Description: Create User Function
+      CodeUri: src/createUser
+      Handler: index.handler
+      Runtime: nodejs12.x
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Role: !GetAtt LambdaRole.Arn
+      Layers:
+      - !Ref CommonLayer
+      Environment:
+        Variables:
+          TABLE_NAME: !Sub "${SourceTableName}"
+          TABLE_ARN: !Sub "${SourceTableArn}"
+          ROLE_ARN: !Sub "${SourceRoleArn}"
+      Events:
+        apiPostUsers:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: POST
+            RestApiId: !Ref API
+
+  DeleteUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-deleteUser
+      Description: Delete User Function
+      CodeUri: src/deleteUser
+      Handler: index.handler
+      Runtime: nodejs12.x
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Role: !GetAtt LambdaRole.Arn
+      Layers:
+      - !Ref CommonLayer
+      Environment:
+        Variables:
+          TABLE_NAME: !Sub "${SourceTableName}"
+          TABLE_ARN: !Sub "${SourceTableArn}"
+          ROLE_ARN: !Sub "${SourceRoleArn}"
+      Events:
+        apiDeleteUsersId:
+          Type: Api
+          Properties:
+            Path: /users/{id}
+            Method: DELETE
+            RestApiId: !Ref API
+
+  ListUsersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-listUsers
+      Description: List Users Function
+      CodeUri: src/listUsers
+      Handler: index.handler
+      Runtime: nodejs12.x
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Role: !GetAtt LambdaRole.Arn
+      Layers:
+      - !Ref CommonLayer
+      Environment:
+        Variables:
+          TABLE_NAME: !Sub "${SourceTableName}"
+          TABLE_ARN: !Sub "${SourceTableArn}"
+          ROLE_ARN: !Sub "${SourceRoleArn}"
+      Events:
+        apiGetUsers:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: GET
+            RestApiId: !Ref API
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  CrudApi:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value: !Sub "https://${API}.execute-api.${AWS::Region}.amazonaws.com/${APIGatewayStageName}/users"
+  AccountId:
+    Description: "Account Id"
+    Value: !Ref "AWS::AccountId"
+  LambdaExecutionRole:
+    Description: Lambda Execution Role
+    Value: !GetAtt LambdaRole.Arn
