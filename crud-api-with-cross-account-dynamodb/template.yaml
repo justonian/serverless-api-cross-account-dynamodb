@@ -112,7 +112,7 @@ Resources:
         Variables:
           TABLE_NAME: !Sub "${SourceTableName}"
           TABLE_ARN: !Sub "${SourceTableArn}"
-          ROLE_ARN: !Sub "${SourceRoleArn}"
+          TABLE_IAM_ROLE_ARN: !Sub "${SourceRoleArn}"
       Events:
         apiGetUsersId:
           Type: Api
@@ -139,7 +139,7 @@ Resources:
         Variables:
           TABLE_NAME: !Sub "${SourceTableName}"
           TABLE_ARN: !Sub "${SourceTableArn}"
-          ROLE_ARN: !Sub "${SourceRoleArn}"
+          TABLE_IAM_ROLE_ARN: !Sub "${SourceRoleArn}"
       Events:
         apiPutUsersId:
           Type: Api
@@ -166,7 +166,7 @@ Resources:
         Variables:
           TABLE_NAME: !Sub "${SourceTableName}"
           TABLE_ARN: !Sub "${SourceTableArn}"
-          ROLE_ARN: !Sub "${SourceRoleArn}"
+          TABLE_IAM_ROLE_ARN: !Sub "${SourceRoleArn}"
       Events:
         apiPostUsers:
           Type: Api
@@ -193,7 +193,7 @@ Resources:
         Variables:
           TABLE_NAME: !Sub "${SourceTableName}"
           TABLE_ARN: !Sub "${SourceTableArn}"
-          ROLE_ARN: !Sub "${SourceRoleArn}"
+          TABLE_IAM_ROLE_ARN: !Sub "${SourceRoleArn}"
       Events:
         apiDeleteUsersId:
           Type: Api
@@ -220,7 +220,7 @@ Resources:
         Variables:
           TABLE_NAME: !Sub "${SourceTableName}"
           TABLE_ARN: !Sub "${SourceTableArn}"
-          ROLE_ARN: !Sub "${SourceRoleArn}"
+          TABLE_IAM_ROLE_ARN: !Sub "${SourceRoleArn}"
       Events:
         apiGetUsers:
           Type: Api
