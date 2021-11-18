@@ -10,5 +10,5 @@ profile = "demos"
 confirm_changeset = true
 capabilities = "CAPABILITY_NAMED_IAM"
 disable_rollback = true
-parameter_overrides = "SourceRoleArn=\"arn:aws:iam::554161763323:role/DynamoDbRole\" SourceTableArn=\"arn:aws:dynamodb:us-east-1:554161763323:table/dynamodb-cross-account-stack-UserTable\" SourceTableName=\"dynamodb-cross-account-stack-UserTable\" APIGatewayStageName=\"prod\""
+parameter_overrides = "SourceRoleArn=\"arn:aws:iam::368532634305:role/DynamoDbRole\" SourceTableArn=\"arn:aws:dynamodb:us-east-1:368532634305:table/dynamodb-cross-account-stack-UserTable\" SourceTableName=\"dynamodb-cross-account-stack-UserTable\" APIGatewayStageName=\"prod\""
 image_repositories = []

@@ -5,10 +5,10 @@ Description: CRUD API with Lambda cross-account assume role sample
 Parameters:
   SourceRoleArn:
     Type: String
-    Default: arn:aws:iam::554161763323:role/DynamoDbRole
+    Default: arn:aws:iam::368532634305:role/DynamoDbRole
   SourceTableArn:
     Type: String
-    Default: arn:aws:dynamodb:us-east-1:554161763323:table/dynamodb-cross-account-stack-UserTable
+    Default: arn:aws:dynamodb:us-east-1:368532634305:table/dynamodb-cross-account-stack-UserTable
   SourceTableName:
     Type: String
     Default: dynamodb-cross-account-stack-UserTable
