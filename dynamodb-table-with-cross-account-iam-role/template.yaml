@@ -54,7 +54,8 @@ Resources:
         - Effect: Allow
           Principal:
             # "AWS": !Sub ${LambdaAssumeRole} # Use for explicit Lambda role trust which is more secure
-            "AWS": "*" # Allows any IAM authenticated principal access within specified AWS organization
+            "AWS": "421275677139" # Allows any IAM role from the allow-listed accounts to assume this role
+            # "AWS": "*" # Allows any authenticated IAM principal to assume this role assuming it also meets any specified conditions
           Action:
           - sts:AssumeRole
           Condition:
