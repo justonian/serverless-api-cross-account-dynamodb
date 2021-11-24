@@ -8,13 +8,16 @@ Globals:
   Function:
     Timeout: 10
 Parameters:
+  OrganizationID:
+    Type: String
+    Default: o-kdmi2yospj
   RoleName:
     Type: String
-    Default: "DynamoDbRole"
+    Default: DynamoDbRole
   LambdaAssumeRole:
+    Type: String
     Default: arn:aws:iam::421275677139:role/crud-api-with-cross-account-dynamodb-st-LambdaRole-L650MMPAUE2Z
     # Replace this role ARN with the ARN of the role in the account where your Lambda functions are deployed
-    Type: String
 
 Resources:
   UserTable:
@@ -49,10 +52,15 @@ Resources:
         Version: '2012-10-17'
         Statement:
         - Effect: Allow
-          Principal: 
-            "AWS": !Sub ${LambdaAssumeRole}
+          Principal:
+            # "AWS": !Sub ${LambdaAssumeRole} # Use for explicit Lambda role trust which is more secure
+            "AWS": "*" # Allows any IAM authenticated principal access within specified AWS organization
           Action:
           - sts:AssumeRole
+          Condition:
+            ForAnyValue:StringLike:
+              aws:PrincipalOrgPaths:
+                - !Sub "${OrganizationID}/*"
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
